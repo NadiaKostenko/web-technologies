@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Casdoor Login with Cookie</title>
+</head>
+<body>
+<h1>Casdoor Login (Token in Cookie)</h1>
+<div id="status">Not logged in!</div>
+<button onclick="login()">Login with Casdoor</button>
+<button onclick="getUserInfo()">Get User Info</button>
+
+<pre id="userinfo"></pre>
+
+<script>
+    function login() {
+        window.location.href = '/login';
+    }
+
+    window.onload = async () => {
+        if (getCookie('access_token')) {
+            document.getElementById('status').innerText = 'Already logged in!';
+        }
+    };
+
+    async function getUserInfo() {
+        const token = getCookie('access_token');
+        if (!token) {
+            alert('Not logged in! If you want to see the User Info, please login.');
+            return;
+        }
+        const res = await fetch('/userinfo', {
+            headers: {
+                'Authorization': token
+            }
+        });
+
+        if (res.ok) {
+            const data = await res.json();
+            document.getElementById('userinfo').innerText = JSON.stringify(data, null, 2);
+        } else
+        {
+            document.getElementById('userinfo').innerText = 'Failed to get user info';
+        }
+    }
+
+    function getCookie(name) {
+        return document.cookie.split('; ')
+            .find(row => row.startsWith(name + '='))
+            ?.split('=') [1];
+    }
+</script>
+</body>
+</html>

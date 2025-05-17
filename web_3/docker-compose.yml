@@ -1,0 +1,30 @@
+#version: "3.8"
+
+services:
+
+  mariadb:
+    image: mariadb:10.5
+    container_name: casdoor-db
+    restart: always
+    environment:
+      MYSQL_USERNAME: root
+      MYSQL_ROOT_PASSWORD: 123
+      MYSQL_DATABASE: casdoor_db
+    ports:
+      - "3306:3306"
+
+  casdoor:
+    image: casbin/casdoor:latest
+    container_name: casdoor
+    depends_on:
+      - mariadb
+    ports:
+      - "10443:10443"
+    volumes:
+      - ./casdoor/conf:/conf
+      - ./casdoor/certs:/certs
+    environment:
+      DB_NAME: casdoor
+      DB_USER: root
+      DB_PASSWORD: 123
+      RUNNING_IN_DOCKER: true
